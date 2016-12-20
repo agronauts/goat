@@ -1,4 +1,5 @@
 import unittest
+
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
@@ -49,6 +50,7 @@ class NewVisitorTest(unittest.TestCase):
         self.fail('Finish the test!')
 
         # The page updates again, and now shows both items on her list
+
 
 if __name__ == "__main__":
     unittest.main(warnings='ignore')
