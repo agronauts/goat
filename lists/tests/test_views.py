@@ -1,5 +1,3 @@
-from unittest import skip
-
 from django.test import TestCase
 from django.urls import resolve
 from django.utils.html import escape
@@ -59,17 +57,6 @@ class ListViewTest(TestCase):
         self.assertEqual(new_item.text, 'A new item for an existing list')
         self.assertEqual(new_item.list, correct_list)
 
-    @skip('Can only test redirection once')
-    def test_redirects_POST_to_list_view(self):
-        other_list = List.objects.create()
-        correct_list = List.objects.create()
-
-        response = self.client.post(
-            '/lists/%d/' % (correct_list.id,),
-            data={'item_text': 'A new item for an existing list'}
-        )
-
-        self.assertRedirects(response, '/lists/%d/' % (correct_list.id,))
 
     def test_validation_errors_end_up_on_lists_page(self):
         list_ = List.objects.create()
