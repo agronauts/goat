@@ -42,6 +42,9 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
+AUTHENTICATION_BACKENDS = [
+    'accounts.authentication.PasswordlessAuthenticationBackend',
+]
 
 
 MIDDLEWARE_CLASSES = [
@@ -142,3 +145,9 @@ LOGGING = {
     },
     'root': {'level': 'INFO'},
 }
+
+# Email
+EMAIL_HOST = 'smtp.mail.com'
+EMAIL_HOST_USER = 'patrick.nicholls@mail.com'
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
+EMAIL_USE_TLS = True
