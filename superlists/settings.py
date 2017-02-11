@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'lists',
     'accounts',
+    'functional_tests',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
@@ -146,8 +147,9 @@ LOGGING = {
     'root': {'level': 'INFO'},
 }
 
+
 # Email
 EMAIL_HOST = 'smtp.mail.com'
-EMAIL_HOST_USER = 'patrick.nicholls@mail.com'
+EMAIL_HOST_USER = 'goat-client@mail.com'
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 EMAIL_USE_TLS = True

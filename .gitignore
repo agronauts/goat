@@ -5,3 +5,4 @@ venv
 db.sqlite3
 *.sqlite3
 .idea/
+/functional_tests/test_email_account_credentials

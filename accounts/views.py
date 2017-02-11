@@ -17,7 +17,7 @@ def send_login_email(request):
     send_mail(
         'Your login link for Superlists',
         'Use this link to log in {url}'.format(url=url),
-        'patrick.nicholls@mail.com',
+        'goat-client@mail.com',
         [email],
     )
     messages.success(request, "Check your email, we've sent you a link you can use to log in.")
