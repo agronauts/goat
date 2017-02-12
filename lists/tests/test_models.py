@@ -1,7 +1,10 @@
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from lists.models import Item, List
+
+User = get_user_model()
 
 
 class ItemAndListModelTest(TestCase):
@@ -59,3 +62,11 @@ class ListModelTest(TestCase):
     def test_string_representation(self):
         item = Item(text='Joe Abercrombie')
         self.assertEqual(str(item), 'Joe Abercrombie')
+
+    def test_lists_can_have_owners(self):
+        user = User.objects.create(email='andrew.bisharat@evenningsends.com')
+        list_ = List.objects.create(owner=user)
+        self.assertIn(list_, user.list_set.all())
+
+    def test_list_owner_is_optional(self):
+        List.objects.create()  # should not raise
