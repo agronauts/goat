@@ -1,6 +1,9 @@
+import unittest
+from unittest.mock import Mock, patch
+
 from django.test import TestCase
 
-from lists.forms import ItemForm, EMPTY_ITEM_ERROR, ExistingListItemForm, DUPLICATE_ITEM_ERROR
+from lists.forms import ItemForm, EMPTY_ITEM_ERROR, ExistingListItemForm, DUPLICATE_ITEM_ERROR, NewListForm
 from lists.models import List, Item
 
 
@@ -18,13 +21,6 @@ class ItemFormTest(TestCase):
         self.assertEqual(
             form.errors['text'], [EMPTY_ITEM_ERROR])
 
-    def test_form_save_handles_item_to_list(self):
-        list_ = List.objects.create()
-        form = ItemForm({'text': 'Ghandi'})
-        new_item = form.save(for_list=list_)
-        self.assertEqual(new_item, Item.objects.first())
-        self.assertEqual(new_item.text, 'Ghandi')
-        self.assertEqual(new_item.list, list_)
 
 class ExistingListItemFormTest(TestCase):
 
@@ -54,3 +50,37 @@ class ExistingListItemFormTest(TestCase):
         new_item = form.save()
         self.assertIn(new_item, Item.objects.all())
 
+class NewListFormTest(unittest.TestCase):
+
+    @patch('lists.forms.List.create_new')
+    def test_save_creates_new_list_from_post_data_if_user_not_authenticated(
+        self, mock_List_create_new
+    ):
+        user = Mock(is_authenticated=False)
+        form = NewListForm(data={'text': 'new item text'})
+        form.is_valid()
+        form.save(owner=user)
+        mock_List_create_new.assert_called_once_with(
+            first_item_text='new item text'
+        )
+
+    @patch('lists.forms.List.create_new')
+    def test_save_creates_new_list_with_owner_if_user_authenticated(
+        self, mock_List_create_new
+    ):
+        user = Mock(is_authenticated=True)
+        form = NewListForm(data={'text': 'new item text'})
+        form.is_valid()
+        form.save(owner=user)
+        mock_List_create_new.assert_called_once_with(
+            first_item_text='new item text', owner=user
+        )
+
+    @patch('lists.models.List.create_new')
+    def test_save_returns_new_list_object(self, mock_List_create_new):
+        owner = Mock()
+        mock_List_create_new.return_value = List()
+
+        form = NewListForm()
+
+        self.assertIsInstance(form.save(owner), List)

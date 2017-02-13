@@ -25,6 +25,18 @@ class ItemAndListModelTest(TestCase):
         self.assertEqual(Item.objects.count(), 0)
 
 class ListModelTest(TestCase):
+
+    def test_save_returns_new_list_object(self):
+        returned = List.create_new(first_item_text='new item text')
+        new_list = List.objects.first()
+        self.assertEqual(returned, new_list)
+
+    def test_list_can_have_owner(self):
+        List(owner=User()) # Should not raise
+
+    def test_list_owner_is_optional(self):
+        List().full_clean() # Should not raise
+
     def test_cannot_save_empty_list(self):
         list_ = List.objects.create()
         item = Item(list=list_, text='')
@@ -35,12 +47,31 @@ class ListModelTest(TestCase):
         list_ = List.objects.create()
         self.assertEqual(list_.get_absolute_url(), '/lists/%d/' % (list_.id,))
 
+    def test_create_new_list_and_first_item(self):
+        List.create_new(first_item_text='Spiritualism without religion')
+        item = Item.objects.first()
+        self.assertEqual(item.text, 'Spiritualism without religion')
+        list_ = List.objects.first()
+        self.assertEqual(item.list, list_)
+
+    def test_create_new_optionally_saves_owner(self):
+        user = User.objects.create()
+        List.create_new(first_item_text='Bruce Brueno', owner=user)
+        list_ = List.objects.first()
+        self.assertEqual(list_.owner, user)
+
     def test_duplicate_items_are_invalid(self):
         list_ = List.objects.create()
         Item.objects.create(list=list_, text='bla')
         with self.assertRaises(ValidationError):
             item = Item(list=list_, text='bla')
             item.full_clean()
+
+    def test_list_name_is_first_item_text(self):
+        list_ = List.objects.create()
+        first_item = Item.objects.create(text='EC', list=list_)
+        second_item = Item.objects.create(text='SD', list=list_)
+        self.assertEqual(list_.name, first_item.text)
 
     def test_CAN_save_same_item_to_different_lists(self):
         list1 = List.objects.create()
