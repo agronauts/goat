@@ -2,7 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 
 from functional_tests.list_page import ListPage
-from functional_tests.my_list_page import MyListPage
+from functional_tests.my_list_page import MyListsPage
 from .base import FunctionalTest
 
 
@@ -45,8 +45,23 @@ class SharingTest(FunctionalTest):
 
         # Oniciferous now goes to the lists page with his browser
         self.browser = oni_browser
-        self.browser.find_element_by_link_text('My lists').click()
-        my_lists_page = MyListPage(self)
+        MyListsPage(self).go_to_my_lists_page()
 
         # He sees Edith's list in there!
-        my_lists_page.check_if_list_is_shared('Get help')
+        self.browser.find_element_by_link_text('Get help').click()
+
+        # On the list page, Oniciferous can see says that it's Edith's list
+        self.wait_for(self.assertEqual(
+            list_page.get_list_owner(),
+            'edith@example.com'
+        ))
+
+        # He adds an item to the list
+        list_page.add_list_item('Green Unicorn')
+
+        # When Edith refreshes the page, she sees Oniciferous's addition
+        self.browser = edith_browser
+        self.browser.refresh()
+        list_page.wait_for_row_in_list_table('Green Unicorn')
+
+
